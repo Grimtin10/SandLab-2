@@ -56,7 +56,7 @@ void draw(){
     }
   }
   drawCircle(mouseX/size,mouseY/size,rad-1,220);
-  surface.setTitle("SandLab ver. "+ver+"Type: "+type+" FPS: "+frameRate);
+  surface.setTitle("SandLab ver. "+ver+" Type: "+type+" FPS: "+frameRate);
   textSize(8);
   text("Hover type: "+cells[mouseX/size][mouseY/size].getType()+" temperature "+cells[mouseX/size][mouseY/size].getTemp(),4,height-4);
 }
@@ -64,9 +64,7 @@ void draw(){
 void update(){
   for(int x=0;x<cells.length;x++){
     for(int y=0;y<cells[0].length;y++){
-      if(cells[x][y].getType()!=0){
-        cells[x][y].updateCell(x,y);
-      }
+      cells[x][y].updateCell(x,y);
       if(x==mouseX/size&&y==mouseY/size){
         if(mousePressed&&mouseButton==LEFT){
           for(int i=0;i<rad;i++){

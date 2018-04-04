@@ -101,8 +101,8 @@ public class Cell{
     for(int i=0;i<8;i++){
       t3+=t2[i];
     }
-    t3=(t3/8)/10;
-    float t4=temp-t3;
+    t3=(t3/8);
+    float t4=t3-temp;
     temp+=t4;
   }
   
