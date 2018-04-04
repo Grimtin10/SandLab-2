@@ -7,21 +7,24 @@ int ver = 1;
 float maxTemp = 9725.85;
 float minTemp = -273.15;
 
-int[] types = {0,1,2,3,4,5};
-int[] states = {0,1,2,3,4,4};
-int[] melt = {5,6,7,5,5};
+int[] types = {0,1,2,3,4,5,6,7,8};
+int[] states = {0,1,2,3,4,4,4,2,3,0,0};
+int[] melt = {0,5,6,7,5,5,5,5,8,0};
 
-float[] weights = {0,30,45,100,50,50};
-float[] temps = {20,20,20,20,20,400};
-float[] melts = {400,100,1000,400,maxTemp};
+float[] weights = {0,30,45,100,50,50,50,45,100};
+float[] temps = {20,20,20,20,20,400,100,1000,20};
+float[] melts = {9999,400,100,1000,400,maxTemp+1,maxTemp+1,maxTemp+1,maxTemp+1};
 
-color[] colors = {color(0,0,0),color(255,248,220),color(0,0,255),color(128,128,128),color(0,245,0),color(255,140,0)};
+color[] colors = {color(0,0,0),color(255,248,220),color(0,0,255),color(128,128,128),color(0,245,0),color(255,140,0),color(100,100,256),color(255,140,0),color(128,128,256)};
 
 IntKey typeState = new IntKey(types,states);
+IntKey meltType = new IntKey(types,melt);
 
 ColorKey typeColor = new ColorKey(types,colors);
 
 FloatKey typeWeight = new FloatKey(types,weights);
+FloatKey typeMelt = new FloatKey(types,melts);
+FloatKey typeTemp = new FloatKey(types,temps);
 
 Cell[][] cells;
 
@@ -46,15 +49,16 @@ void draw(){
         //if(cells[x][y].getTemp()>=1000){
           //fill((typeColor.getMatch(cells[x][y].getType()))+color(cells[x][y].getTemp()-1000));
         //} else {
-          fill((typeColor.getMatch(cells[x][y].getType()))+color(cells[x][y].getTemp()));
+          fill((typeColor.getMatch(cells[x][y].getType())));
         //}
         rect(x*size,y*size,size,size);
       }
     }
   }
   drawCircle(mouseX/size,mouseY/size,rad-1,220);
-  textSize(16);
-  surface.setTitle("SandLab ver. "+ver+" FPS: "+frameRate);
+  surface.setTitle("SandLab ver. "+ver+"Type: "+type+" FPS: "+frameRate);
+  textSize(8);
+  text("Hover type: "+cells[mouseX/size][mouseY/size].getType()+" temperature "+cells[mouseX/size][mouseY/size].getTemp(),4,height-4);
 }
 
 void update(){
@@ -66,7 +70,11 @@ void update(){
       if(x==mouseX/size&&y==mouseY/size){
         if(mousePressed&&mouseButton==LEFT){
           for(int i=0;i<rad;i++){
-            drawCircle(x,y,i,new Cell(20,type,typeState.getMatch(type),typeWeight.getMatch(type)));
+            if(type>=0){
+              drawCircle(x,y,i,new Cell(typeTemp.getMatch(type),type,typeState.getMatch(type),typeWeight.getMatch(type)));
+            } else {
+              drawCircle(x,y,i,true,-10);
+            }
           }
         } else if(mousePressed&&mouseButton==RIGHT){
           for(int i=0;i<rad;i++){
@@ -134,7 +142,7 @@ void makeWalls(){
     cells[0][i]=new Cell(20,wallType,typeState.getMatch(wallType),typeWeight.getMatch(wallType));
   }
   for(int i=0;i<cells[0].length;i++){
-    cells[cells.length-1][0]=new Cell(20,wallType,typeState.getMatch(wallType),typeWeight.getMatch(wallType));
+    cells[cells.length-1][i]=new Cell(20,wallType,typeState.getMatch(wallType),typeWeight.getMatch(wallType));
   }
 }
 
@@ -249,6 +257,69 @@ void drawCircle(int centerX,int centerY,int radius,Cell cell){
     } while (x <= y);
 }
 
+void drawCircle(int centerX,int centerY,int radius,boolean changeTemp,float change){
+  int d = 3 - (2 * radius);
+  int x = 0;
+  int y = radius;
+  do {
+      /*image.setPixel(centerX + x, centerY + y, circleColor);
+      image.setPixel(centerX + x, centerY - y, circleColor);
+      image.setPixel(centerX - x, centerY + y, circleColor);
+      image.setPixel(centerX - x, centerY - y, circleColor);
+      image.setPixel(centerX + y, centerY + x, circleColor);
+      image.setPixel(centerX + y, centerY - x, circleColor);
+      image.setPixel(centerX - y, centerY + x, circleColor);
+      image.setPixel(centerX - y, centerY - x, circleColor);*/
+      int centerXPlus = centerX+x;
+      int centerXMinus = centerX-x;
+      int centerYPlus = centerX+y;
+      int centerYMinus = centerX-y;
+      int centerYYPlus = centerY+y;
+      int centerYYMinus = centerY-y;
+      int centerYXPlus = centerY+x;
+      int centerYXMinus = centerY-x;
+      if(centerXPlus>cells.length-1){
+        centerXPlus = cells.length-1;
+      }
+      if(centerXMinus<1){
+        centerXMinus = 1;
+      }
+      if(centerYPlus>cells.length-1){
+        centerYPlus = cells.length-1;
+      }
+      if(centerYMinus<1){
+        centerYMinus = 1;
+      }
+      if(centerYXPlus>cells[0].length-1){
+        centerYXPlus = cells[0].length-1;
+      }
+      if(centerYXMinus<1){
+        centerYXMinus = 1;
+      }
+      if(centerYYPlus>cells[0].length-1){
+        centerYYPlus = cells[0].length-1;
+      }
+      if(centerYYMinus<1){
+        centerYYMinus = 1;
+      }
+      cells[centerXPlus][centerYYPlus].changeTemp(change);
+      cells[centerXPlus][centerYYMinus].changeTemp(change);
+      cells[centerXMinus][centerYYPlus].changeTemp(change);
+      cells[centerXMinus][centerYYMinus].changeTemp(change);
+      cells[centerYPlus][centerYXPlus].changeTemp(change);
+      cells[centerYPlus][centerYXMinus].changeTemp(change);
+      cells[centerYMinus][centerYXPlus].changeTemp(change);
+      cells[centerYMinus][centerYXMinus].changeTemp(change);
+          if (d < 0) {
+              d = d + (4 * x) + 6;
+          } else {
+              d = d + 4 * (x - y) + 10;
+              y--;
+          }
+          x++;
+    } while (x <= y);
+}
+
 void keyPressed(){
   if (key == CODED) {
     if(keyCode==UP){
@@ -260,7 +331,7 @@ void keyPressed(){
     if(keyCode==RIGHT&&type<types.length-1){
       type++;
     }
-    if(keyCode==LEFT&&type>=1){
+    if(keyCode==LEFT&&type>=-2){
       type--;
     }
   } else {
@@ -270,6 +341,7 @@ void keyPressed(){
           cells[x][y] = new Cell(20,0,0,0);
         }
       }
+      makeWalls();
     }
   }
 }

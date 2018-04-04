@@ -1,10 +1,10 @@
 public class Cell{
   int state = 0;
   int type = 0;
-  int temp = 0;
+  float temp = 0;
   float weight = 0;
   
-  public Cell(int temp,int type,int state,float weight){
+  public Cell(float temp,int type,int state,float weight){
     this.state = state;
     this.temp = temp;
     this.type = type;
@@ -40,7 +40,7 @@ public class Cell{
       float r2=random(0,100);
       if(y<cells[0].length-1){
         if(r2>=100-weight){
-          if(cells[x][y+1].getType()==0||cells[x][y-1].getWeight()<weight){
+          if(cells[x][y+1].getType()==0||cells[x][y+1].getWeight()<weight){
             Cell c = cells[x][y+1];
             cells[x][y+1]=cells[x][y];
             cells[x][y]=c;
@@ -82,6 +82,11 @@ public class Cell{
       }
     }
     doTemp(x,y);
+    if(temp>typeMelt.getMatch(type)){
+      type=meltType.getMatch(type);
+      state=typeState.getMatch(type);
+    }
+    temp=(temp>maxTemp)?maxTemp:(temp<minTemp)?minTemp:temp;
   }
   
   public void doSpecial(){}
@@ -96,9 +101,12 @@ public class Cell{
     for(int i=0;i<8;i++){
       t3+=t2[i];
     }
-    t3=t3/8;
-    temp+=t3;
+    t3=(t3/8)/10;
+    float t4=temp-t3;
+    temp+=t4;
   }
+  
+  public void changeTemp(float change){temp+=change;}
   
   public int getType(){return type;}
   public float getWeight(){return weight;}
