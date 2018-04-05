@@ -1,14 +1,17 @@
 public class Cell{
   int state = 0;
   int type = 0;
+  int tmp = 0;
   float temp = 0;
   float weight = 0;
+  float thermal = 100;
   
-  public Cell(float temp,int type,int state,float weight){
+  public Cell(float temp,int type,int state,float weight,float thermal){
     this.state = state;
     this.temp = temp;
     this.type = type;
     this.weight = weight;
+    this.thermal = thermal;
   }
   
   public void updateCell(int x,int y){
@@ -32,7 +35,7 @@ public class Cell{
           }
         }
       } else {
-        cells[x][y]=new Cell(0,0,0,0);
+        cells[x][y]=emptyCell;
       }
     }
     if(state==2&&x>0&&x<cells.length-1){
@@ -55,7 +58,7 @@ public class Cell{
           }
         }
       } else {
-        cells[x][y]=new Cell(0,0,0,0);
+        cells[x][y]=emptyCell;
       }
     }
     if(state==4&&x>0&&x<cells.length-1){
@@ -78,18 +81,43 @@ public class Cell{
           }
         }
       } else {
-        cells[x][y]=new Cell(0,0,0,0);
+        cells[x][y]=emptyCell;
       }
     }
     doTemp(x,y);
-    if(temp>typeMelt.getMatch(type)){
+    if(temp==typeMelt.getMatch(type)){
       type=meltType.getMatch(type);
       state=typeState.getMatch(type);
     }
     temp=(temp>maxTemp)?maxTemp:(temp<minTemp)?minTemp:temp;
+    //if(flammable){
+    //  Cell[] t = getNeighbors(x,y);
+    //  boolean heat = false;
+    //  for(int i=0;i<8;i++){
+    //    if(t[i].getHot()){
+    //      heat=true;
+    //    }
+    //  }
+    //  if(heat){
+    //    cells[x][y]=new Cell(typeTemp.getMatch(4),4,typeState.getMatch(4),typeWeight.getMatch(4),typeFlame.getMatch(4),typeHeat.getMatch(4),typeTime.getMatch(4));
+    //  }
+    //}
   }
   
-  public void doSpecial(){}
+  public void doSpecial(int x,int y){
+    if(type==5){
+      if(tmp==0){
+        tmp=fireLast+1;
+      } else if(tmp==1){
+        cells[x][y]=emptyCell;
+      } else {
+        tmp--;
+      }
+      if(temp<400){
+        temp=400;
+      }
+    }
+  }
   
   public void doTemp(int x,int y){
     Cell[] t = getNeighbors(x,y);
@@ -101,8 +129,9 @@ public class Cell{
     for(int i=0;i<8;i++){
       t3+=t2[i];
     }
+    float t5=(thermal/100);
     t3=(t3/8);
-    float t4=t3-temp;
+    float t4=(t3-temp)*t5;
     temp+=t4;
   }
   
