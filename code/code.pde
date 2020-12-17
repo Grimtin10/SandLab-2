@@ -1,4 +1,4 @@
-int size = 2;
+int size = 16;
 int type = 1;
 int rad = 1;
 int wallType = 3;
@@ -351,7 +351,7 @@ void keyPressed(){
       type--;
     }
   } else {
-    if(key==DELETE){
+    if(key=='r'){
       for(int x=0;x<(width-1)/size;x++){
         for(int y=0;y<(height-1)/size;y++){
           cells[x][y] = new Cell(typeTemp.getMatch(0),0,typeState.getMatch(0),typeWeight.getMatch(0),typeConduct.getMatch(0));;
